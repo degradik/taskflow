@@ -16,7 +16,7 @@ class MoonshineUserSeeder extends Seeder
     {
         MoonshineUser::query()->create([
             "name" => "admin",
-            "password" => bcrypt("123"),
+            "password" => bcrypt("123123"),
             "email" => "admin"
         ]);
     }
