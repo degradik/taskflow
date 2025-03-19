@@ -63,7 +63,7 @@ class UserResource extends ModelResource
         return [
             'name'  => ['required', 'max:50'],
             'email' => ['required', 'email', 'max:100', 'unique:users,email,' . $this->getItemID()],
-            'role'  => ['required', 'in:creator,manager,member'],
+            'role'  => ['required', 'in:admin,teamlead,developer'],
         ];
     }
 }
