@@ -15,6 +15,8 @@ use MoonShine\Menu\MenuElement;
 use MoonShine\Pages\Page;
 use Closure;
 
+use App\MoonShine\Resources\UserResource;
+
 class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
 {
     /**
@@ -53,6 +55,9 @@ class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
             MenuItem::make('Documentation', 'https://moonshine-laravel.com/docs')
                 ->badge(fn() => 'Check')
                 ->blank(),
+
+            MenuItem::make("Пользователи",new \App\MoonShine\Resources\UserResource()),
+
         ];
     }
 
