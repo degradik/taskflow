@@ -22,7 +22,7 @@ class AuthController extends Controller
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
-            'role'     => 'member', // по умолчанию
+            'role'     => 'developer', // по умолчанию
         ]);
 
         return response()->json(['message' => 'User registered successfully', 'user' => $user]);
