@@ -15,7 +15,6 @@ use MoonShine\Menu\MenuElement;
 use MoonShine\Pages\Page;
 use Closure;
 
-use App\MoonShine\Resources\UserResource;
 
 class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
 {
@@ -57,6 +56,8 @@ class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
                 ->blank(),
 
             MenuItem::make("Пользователи",new \App\MoonShine\Resources\UserResource()),
+
+            MenuItem::make("Проекты",new \App\MoonShine\Resources\ProjectResource()),
 
         ];
     }
