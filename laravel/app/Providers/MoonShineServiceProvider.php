@@ -59,6 +59,12 @@ class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
 
             MenuItem::make("Проекты",new \App\MoonShine\Resources\ProjectResource()),
 
+            MenuItem::make("Задачи",new \App\MoonShine\Resources\TaskResource()),
+
+            MenuItem::make('Custom Fields', new \App\MoonShine\Resources\CustomFieldResource()),
+            MenuItem::make('Custom Field Values', new \App\MoonShine\Resources\CustomFieldValueResource()),
+
+
         ];
     }
 
