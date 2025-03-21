@@ -6,7 +6,7 @@ namespace App\MoonShine\Resources;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Password;
 use MoonShine\Resources\ModelResource;
 use MoonShine\Decorations\Block;
 use MoonShine\Fields\ID;
@@ -41,6 +41,8 @@ class UserResource extends ModelResource
             Email::make('Email', 'email')
                 ->required()
                 ->sortable(),
+
+            Text::make('Password', 'password')->required(),
 
             Select::make('Role', 'role')
                 ->options([
