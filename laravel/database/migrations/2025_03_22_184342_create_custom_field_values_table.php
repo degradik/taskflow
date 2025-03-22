@@ -13,13 +13,10 @@ return new class extends Migration
     {
         Schema::create('custom_field_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('custom_field_id')->constrained('custom_fields')->onDelete('cascade');
-            $table->unsignedBigInteger('entity_id'); // id сущности (Task id, Project id и т.д.)
-            $table->string('entity_type');           // Тип сущности (Task, Project и т.п.)
-            $table->text('value')->nullable();       // Значение кастомного поля
+            $table->foreignId('task_id')->constrained()->onDelete('cascade');
+            $table->foreignId('custom_field_id')->constrained()->onDelete('cascade');
+            $table->text('value'); // Значение поля (может быть текстом, числом, датой)
             $table->timestamps();
-        
-            $table->index(['entity_id', 'entity_type']); // Для быстрого поиска
         });
     }
 

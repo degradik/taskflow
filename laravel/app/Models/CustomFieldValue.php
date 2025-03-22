@@ -9,15 +9,15 @@ class CustomFieldValue extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'custom_field_id',
-        'entity_id',
-        'entity_type',
-        'value'
-    ];
+    protected $fillable = ['task_id', 'custom_field_id', 'value'];
 
-    public function field()
+    public function customField()
     {
         return $this->belongsTo(CustomField::class, 'custom_field_id');
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class, 'task_id');
     }
 }
