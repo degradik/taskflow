@@ -5,7 +5,10 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
 
-use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CustomFieldController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,10 +32,22 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->get('/user', [AuthController::class, 'user']);
 
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/projects', [ProjectController::class, 'index']);
-    Route::post('/projects', [ProjectController::class, 'store']);
-    Route::get('/projects/{project}', [ProjectController::class, 'show']);
-    Route::put('/projects/{project}', [ProjectController::class, 'update']);
-    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+// Защищённые маршруты
+Route::middleware('auth:api')->group(function () {
+    
+    // Текущий пользователь
+    Route::get('/user', [AuthController::class, 'user']);
+
+    // Проекты
+    Route::apiResource('projects', ProjectController::class);
+    
+    // Задачи
+    Route::apiResource('tasks', TaskController::class);
+
+    // Пользователи (например, список участников проекта)
+    Route::get('/users', [UserController::class, 'index']);
+
+    // Кастомные поля (если нужно на фронт)
+    Route::get('/custom-fields/{entity_type}', [CustomFieldController::class, 'index']);
+
 });
