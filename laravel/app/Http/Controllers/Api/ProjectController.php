@@ -3,61 +3,142 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\Auth; 
 
-class ProjectController extends Controller
+use App\Models\User;
+
+class ProjectController extends BaseController
 {
-    public function index()
-    {
-        $projects = auth()->user()
-            ->projects() // Связь projects в модели User
-            ->with('tasks') // Подгружаем задачи проекта
-            ->get();
 
-        return response()->json($projects);
+
+    public function index(){
+
+        $projects = Project::query()->get();
+        return $this->sendResponse("OK", ProjectResource::collection($projects));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
+            'status'      => 'nullable|integer',
+            'deadline'    => 'nullable|date',
         ]);
 
-        $project = auth()->user()->projects()->create($validated);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
 
-        return response()->json($project, 201);
+        $input = $request->all();
+        $input['owner_id'] = Auth::id();
+
+        $project = Project::create($input);
+
+        return $this->sendResponse($project, 'Project created successfully.');
     }
-
+    
+    /**
+     * Получить конкретный проект
+     */
     public function show($id)
     {
-        $project = auth()->user()->projects()
-            ->with('tasks.customFieldValues.customField')
-            ->findOrFail($id);
+        $project = Project::find($id);
 
-        return response()->json($project);
+        if (is_null($project)) {
+            return $this->sendError('Project not found.');
+        }
+
+        if ($project->owner_id !== Auth::id()) {
+            return $this->sendError('Unauthorized.', [], 403);
+        }
+
+        return $this->sendResponse($project, 'Project retrieved successfully.');
     }
 
+    /**
+     * Обновить проект
+     */
     public function update(Request $request, $id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::find($id);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
+        if (is_null($project)) {
+            return $this->sendError('Project not found.');
+        }
+
+        if ($project->owner_id !== Auth::id()) {
+            return $this->sendError('Unauthorized.', [], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'title'       => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
+            'status'      => 'nullable|integer',
+            'deadline'    => 'nullable|date',
         ]);
 
-        $project->update($validated);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
 
-        return response()->json($project);
+        $project->update($request->all());
+
+        return $this->sendResponse($project, 'Project updated successfully.');
     }
 
+    /**
+     * Удалить проект
+     */
     public function destroy($id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::find($id);
+
+        if (is_null($project)) {
+            return $this->sendError('Project not found.');
+        }
+
+        if ($project->owner_id !== Auth::id()) {
+            return $this->sendError('Unauthorized.', [], 403);
+        }
 
         $project->delete();
 
-        return response()->json(['message' => 'Проект удален']);
+        return $this->sendResponse([], 'Project deleted successfully.');
+    }
+
+
+    public function addUser(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'nullable|string'
+        ]);
+
+        $role = $validated['role'] ?? 'member';
+
+        // Добавляем пользователя с ролью
+        $project->users()->attach($validated['user_id'], ['role' => $role]);
+
+        return response()->json([
+            'message' => 'Пользователь добавлен в проект',
+            'project_id' => $project->id,
+            'user_id' => $validated['user_id'],
+            'role' => $role
+        ]);
+    }
+
+    public function removeUser(Project $project, User $user)
+    {
+        $project->users()->detach($user->id);
+
+        return response()->json([
+            'message' => 'Пользователь удалён из проекта',
+            'project_id' => $project->id,
+            'user_id' => $user->id
+        ]);
     }
 }

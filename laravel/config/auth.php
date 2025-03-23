@@ -37,12 +37,12 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'sanctum',
+            'driver' => 'session',
             'provider' => 'users',
         ],
 
         'api' => [
-            'driver' => 'jwt', // или 'token' или 'passport' в зависимости от твоей реализации
+            'driver' => 'sanctum',
             'provider' => 'users',
             'hash' => false,
         ],
