@@ -15,9 +15,11 @@ use MoonShine\Components\MoonShineComponent;
 
 use MoonShine\Fields\Text;
 use MoonShine\Fields\Select;
-use MoonShine\Fields\Json;
 use MoonShine\Fields\Relationships\BelongsTo;
 use MoonShine\Resources\Resource;
+
+use MoonShine\Fields\Switcher;
+use MoonShine\Fields\Json; 
 
 
 
@@ -48,12 +50,12 @@ class CustomFieldResource extends ModelResource
                     'select' => 'Список',
                 ])
                 ->required(),
-            Json::make('Опции', 'options')
-                ->fields([
-                    Text::make('Ключ'),
-                    Text::make('Значение'),
-                ])
-                ->hideOnIndex(),
+
+            Json::make('Options', 'options')
+                ->keyValue(
+                    keyField: Text::make('Key'),
+                    valueField: Text::make('Value')
+                )
         ];
     }
 

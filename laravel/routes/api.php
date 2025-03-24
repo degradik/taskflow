@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CustomFieldController;
-
+use App\Http\Controllers\Api\CustomFieldValueController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,7 +29,7 @@ use App\Http\Controllers\Api\CustomFieldController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'user']);
+Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'user']);   
 
 
 
@@ -40,6 +40,24 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/projects/{project}/users', [ProjectController::class, 'addUser']);
     Route::delete('/projects/{project}/users/{user}', [ProjectController::class, 'removeUser']);
+
+    // Задачи в рамках проектов
+    Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
+    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
+    Route::get('/projects/{project}/tasks/{task}', [TaskController::class, 'show']);
+    Route::put('/projects/{project}/tasks/{task}', [TaskController::class, 'update']);
+    Route::delete('/projects/{project}/tasks/{task}', [TaskController::class, 'destroy']);
+
+    // Кастомные поля
+    Route::get('/tasks/{task}/custom-fields', [CustomFieldController::class, 'index']);
+    Route::post('/tasks/{task}/custom-fields', [CustomFieldController::class, 'store']);
+    Route::put('/tasks/{task}/custom-fields/{customField}', [CustomFieldController::class, 'update']);
+    Route::delete('/tasks/{task}/custom-fields/{customField}', [CustomFieldController::class, 'destroy']);
+
+    // Значения кастомных полей
+    Route::get('/tasks/{task}/custom-field-values', [CustomFieldValueController::class, 'index']);
+    Route::post('/tasks/{task}/custom-fields/{customField}/value', [CustomFieldValueController::class, 'storeOrUpdate']);
+    Route::delete('/tasks/{task}/custom-fields/{customField}/value/{customFieldValue}', [CustomFieldValueController::class, 'destroy']);
 
 });
 
