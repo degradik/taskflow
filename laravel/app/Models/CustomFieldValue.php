@@ -9,7 +9,11 @@ class CustomFieldValue extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['task_id', 'custom_field_id', 'value'];
+    protected $fillable = [
+        'task_id',
+        'custom_field_id',
+        'value'
+    ];
 
     public function customField()
     {
