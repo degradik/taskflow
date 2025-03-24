@@ -10,12 +10,7 @@ class CustomField extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'task_id',
-        'title',
-        'type',
-        'options'
-    ];
+    protected $fillable = ['task_id', 'title', 'type', 'options'];
 
     protected $casts = [
         'options' => 'array',

@@ -54,7 +54,7 @@ class TaskResource extends ModelResource
     
                 Textarea::make('Description'),
     
-                BelongsTo::make('Assigned To', 'assignedUser', 'name', new UserResource())
+                BelongsTo::make('Assigned To', 'assignee', 'name', new UserResource())
                     ->nullable(),
     
                 Select::make('Status')

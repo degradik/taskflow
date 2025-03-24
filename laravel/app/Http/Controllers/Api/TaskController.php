@@ -12,81 +12,102 @@ use App\Models\CustomField;
 use App\Models\CustomFieldValue;
 use Illuminate\Http\Request;
 
-use App\Models\Project;
-
 class TaskController extends Controller
 {
-    // Список задач проекта
-    public function index(Project $project)
+    public function index()
     {
-        $tasks = $project->tasks()->with('assignedUser')->get();
+        // Список задач пользователя через его проекты
+        $tasks = Task::whereHas('project', function ($query) {
+            $query->where('owner_id', auth()->id());
+        })->with('customFieldValues.customField')->get();
 
         return response()->json($tasks);
     }
 
-    // Создание задачи в проекте
-    public function store(Request $request, Project $project)
+    public function store(Request $request)
     {
         $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'assigned_to' => 'nullable|exists:users,id',
-            'status' => 'integer',
-            'priority' => 'integer',
+            'status' => 'nullable|integer',
+            'priority' => 'nullable|integer',
             'due_date' => 'nullable|date',
         ]);
 
+        $project = auth()->user()->projects()->findOrFail($validated['project_id']);
+
         $task = $project->tasks()->create($validated);
 
-        return response()->json([
-            'message' => 'Задача успешно создана',
-            'task' => $task
-        ], 201);
+        // Сохраняем кастомные поля
+        $this->saveCustomFields($task, $request->input('custom_fields', []));
+
+        return response()->json($task, 201);
     }
 
-    // Показать задачу
-    public function show(Project $project, Task $task)
+    public function show($id)
     {
-        if ($task->project_id !== $project->id) {
-            return response()->json(['message' => 'Задача не принадлежит проекту'], 403);
-        }
+        $task = Task::with('customFieldValues.customField')
+            ->whereHas('project', function ($query) {
+                $query->where('owner_id', auth()->id());
+            })
+            ->findOrFail($id);
 
         return response()->json($task);
     }
 
-    // Обновить задачу
-    public function update(Request $request, Project $project, Task $task)
+    public function update(Request $request, $id)
     {
-        if ($task->project_id !== $project->id) {
-            return response()->json(['message' => 'Задача не принадлежит проекту'], 403);
-        }
+        $task = Task::whereHas('project', function ($query) {
+            $query->where('owner_id', auth()->id());
+        })->findOrFail($id);
 
         $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'assigned_to' => 'nullable|exists:users,id',
-            'status' => 'integer',
-            'priority' => 'integer',
+            'status' => 'nullable|integer',
+            'priority' => 'nullable|integer',
             'due_date' => 'nullable|date',
         ]);
 
         $task->update($validated);
 
-        return response()->json([
-            'message' => 'Задача обновлена',
-            'task' => $task
-        ]);
+        // Сохраняем кастомные поля
+        $this->saveCustomFields($task, $request->input('custom_fields', []));
+
+        return response()->json($task);
     }
 
-    // Удалить задачу
-    public function destroy(Project $project, Task $task)
+    public function destroy($id)
     {
-        if ($task->project_id !== $project->id) {
-            return response()->json(['message' => 'Задача не принадлежит проекту'], 403);
-        }
+        $task = Task::whereHas('project', function ($query) {
+            $query->where('owner_id', auth()->id());
+        })->findOrFail($id);
 
         $task->delete();
 
         return response()->json(['message' => 'Задача удалена']);
+    }
+
+    private function saveCustomFields(Task $task, array $customFields)
+    {
+        foreach ($customFields as $slug => $value) {
+            $field = CustomField::where('slug', $slug)
+                ->where('entity_type', Task::class)
+                ->first();
+
+            if ($field) {
+                CustomFieldValue::updateOrCreate(
+                    [
+                        'custom_field_id' => $field->id,
+                        'entity_id' => $task->id,
+                        'entity_type' => Task::class,
+                    ],
+                    ['value' => $value]
+                );
+            }
+        }
     }
 }
