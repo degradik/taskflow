@@ -49,4 +49,13 @@ class AuthController extends Controller
     {
         return response()->json(Auth::user());
     }
+
+    public function logout(Request $request)
+    {
+        // Удаляем текущий токен
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Вы успешно вышли из аккаунта']);
+    }
+
 }

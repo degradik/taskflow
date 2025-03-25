@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\CustomFieldController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'user']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 
 
@@ -40,7 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/projects/{project}/users', [ProjectController::class, 'addUser']);
     Route::delete('/projects/{project}/users/{user}', [ProjectController::class, 'removeUser']);
-
+    
 });
 
 
