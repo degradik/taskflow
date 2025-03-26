@@ -52,10 +52,23 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Удаляем текущий токен
-        $request->user()->currentAccessToken()->delete();
+        // Проверяем, есть ли у пользователя реальный токен (не TransientToken)
+        if ($request->user()->tokens()->count() > 0) {
+            // Удаляем только текущий токен
+            $request->user()->currentAccessToken()->delete();
+        }
 
         return response()->json(['message' => 'Вы успешно вышли из аккаунта']);
     }
+
+    public function logoutAll(Request $request)
+    {
+        Auth::guard('web')->logout(); // Выход пользователя
+        $request->session()->invalidate(); // Очистка сессии
+        $request->session()->regenerateToken(); // Генерация нового CSRF-токена
+    
+        return response()->json(['message' => 'Вы успешно вышли']);
+    }
+
 
 }
