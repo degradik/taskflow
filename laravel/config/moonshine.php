@@ -66,6 +66,8 @@ return [
         'default_with_export' => true,
     ],
 
+    'middleware' => ['web', 'auth'],
+    
     'auth' => [
         'enable' => true,
         'middleware' => Authenticate::class,
