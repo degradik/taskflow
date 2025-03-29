@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->integer('role')->default(0); // Например: 0 - участник, 1 - менеджер
+            $table->integer('role')->default(0);
             $table->timestamps();
         });
     }

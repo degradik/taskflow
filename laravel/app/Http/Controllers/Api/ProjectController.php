@@ -118,16 +118,13 @@ class ProjectController extends BaseController
             'role' => 'nullable|string'
         ]);
 
-        $role = $validated['role'] ?? 'member';
-
         // Добавляем пользователя с ролью
-        $project->users()->attach($validated['user_id'], ['role' => $role]);
+        $project->users()->attach($validated['user_id']);
 
         return response()->json([
             'message' => 'Пользователь добавлен в проект',
             'project_id' => $project->id,
-            'user_id' => $validated['user_id'],
-            'role' => $role
+            'user_id' => $validated['user_id']
         ]);
     }
 

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CustomFieldController;
 use App\Http\Controllers\Api\CustomFieldValueController;
+use App\Http\Controllers\Api\ProjectUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tasks/{task}/custom-fields/{customField}/value', [CustomFieldValueController::class, 'storeOrUpdate']);
     Route::delete('/tasks/{task}/custom-fields/{customField}/value/{customFieldValue}', [CustomFieldValueController::class, 'destroy']);
 
+
+    Route::post('/projects/{projectId}/users', [ProjectUserController::class, 'addUser']); // Добавить пользователя
+    Route::get('/projects/{projectId}/users', [ProjectUserController::class, 'getUsers']); // Получить всех пользователей
+    Route::delete('/projects/{projectId}/users/{userId}', [ProjectUserController::class, 'removeUser']); // Удалить пользователя
 });
 
 
